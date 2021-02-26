@@ -278,6 +278,19 @@ open class MultipleStackNavigator(
         outState.putBundle(MEDUSA_STACK_STATE_KEY, fragmentStackStateMapper.toBundle(fragmentStackState))
     }
 
+    override fun reset(tabIndex: Int, fragmentStackIndex: Int) {
+        val fragmentTagStack = fragmentStackState.fragmentTagStack[tabIndex]
+        val stackSize = fragmentTagStack.size - 1
+        if (stackSize > fragmentStackIndex) {
+            (stackSize downTo fragmentStackIndex + 1).forEach { position ->
+                fragmentManagerController.findFragmentByTagAndRemove(fragmentTagStack[position].fragmentTag)
+                fragmentTagStack.pop()
+            }
+            fragmentManagerController.commitAllowingStateLoss()
+            fragmentManagerController.enableFragment(getCurrentFragmentTag())
+        }
+    }
+
     companion object {
         const val DEFAULT_GROUP_NAME = ""
 
